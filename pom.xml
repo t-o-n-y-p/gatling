@@ -16,9 +16,15 @@
     <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
     <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
     <scala-maven-plugin.version>4.9.1</scala-maven-plugin.version>
+    <nscala-time_3.version>2.32.0</nscala-time_3.version>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>com.github.nscala-time</groupId>
+      <artifactId>nscala-time_3</artifactId>
+      <version>${nscala-time_3.version}</version>
+    </dependency>
     <dependency>
       <groupId>io.gatling.highcharts</groupId>
       <artifactId>gatling-charts-highcharts</artifactId>
