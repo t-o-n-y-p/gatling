@@ -8,12 +8,12 @@ import io.gatling.http.protocol.HttpProtocolBuilder
 
 import scala.concurrent.duration.*
 
-class ReliabilitySimulation extends Simulation {
+class RegressionSimulation extends Simulation {
 
   setUp(
     Scenarios.webToursRegression.inject(
-      // 80%
-      rampUsers(24).during(Scenarios.webToursRegressionInterval),
+      // 150%
+      rampUsers(45).during(Scenarios.webToursRegressionInterval),
       nothingFor(30.minutes)
     ),
   )
@@ -27,4 +27,5 @@ class ReliabilitySimulation extends Simulation {
       responseTimePercentile90(BuyFlight)
     )
     .protocols(Protocols.webTours)
+
 }

@@ -11,14 +11,14 @@ import scala.concurrent.duration._
 class MaxPerformanceSimulation extends Simulation {
 
   setUp(
-    Scenarios.webTours.inject(
-      incrementConcurrentUsers(7)
-        .times(10)
+    Scenarios.webToursRegression.inject(
+      incrementConcurrentUsers(3)
+        .times(15)
         .eachLevelLasting(2.minutes)
-        .separatedByRampsLasting(Scenarios.webToursInterval)
+        .separatedByRampsLasting(Scenarios.webToursRegressionInterval)
     ),
   )
-    .maxDuration(20.minutes + Scenarios.webToursInterval * 10)
+    .maxDuration(30.minutes + Scenarios.webToursRegressionInterval * 15)
     .assertions(
       responseTimePercentile90(OpenMainPage),
       responseTimePercentile90(Login),
