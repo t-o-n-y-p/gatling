@@ -11,7 +11,11 @@ class ReliabilitySimulation extends Simulation {
 
   setUp(
     Scenarios.dictionary.inject(
-      rampUsers(400).during(Scenarios.dictionaryInterval),
+      rampUsers(1).during(Scenarios.dictionaryInterval),
+      nothingFor(5.minutes)
+    ),
+    Scenarios.dictionaryAdmins.inject(
+      rampUsers(34).during(Scenarios.dictionaryInterval),
       nothingFor(5.minutes)
     ),
   )

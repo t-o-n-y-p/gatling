@@ -7,20 +7,31 @@ import scala.concurrent.duration._
 
 object Scenarios {
 
-  val dictionaryInterval: FiniteDuration = 3.seconds
+  val dictionaryInterval: FiniteDuration = 12.seconds
 
   val dictionary: ScenarioBuilder =
     scenario("dictionary")
       .forever(
         pace(dictionaryInterval)
           .feed(Feeders.search)
-          .exec { session =>
-            val word = session("search").as[String]
-            val parts = for (n <- Seq(1, 2, 3)) yield word.take(n)
-            val newSession = session.set("parts", parts)
-            newSession
-          }
           .exec(Actions.searchStartsWith)
+          .randomSwitch(
+            90.0 -> exec(Actions.searchStartsWith),
+            10.0 -> feed(Feeders.users).feed(Feeders.words).exec(Actions.loginAndSend)
+          )
+          .exec(flushSessionCookies)
+          .exec(flushHttpCache)
+      )
+
+  val dictionaryAdmins: ScenarioBuilder =
+    scenario("dictionary admins")
+      .feed(Feeders.admins)
+      .feed(Feeders.filters)
+      .exec(Actions.adminLogin)
+      .forever(
+        pace(dictionaryInterval * 10)
+          .exec(Actions.adminSearch)
+          .exec(Actions.adminActions)
           .exec(flushSessionCookies)
           .exec(flushHttpCache)
       )
