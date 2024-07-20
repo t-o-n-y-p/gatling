@@ -77,32 +77,41 @@ object Actions {
       .check(status is 200)
       .check(jsonPath("$.access_token").saveAs("token"))
 
-  val adminSearch: HttpRequestBuilder =
-    http("Admin search")
-      .post(":8080/api/v1/meaning/search")
-      .asJson
-      .body(StringBody(
-        f"""{
-           |\"requestId\":\"${UUID.randomUUID().toString}\",
-           |\"meaningFilter\":{
-           |  \"approved\":false
-           |}
-           |}""".stripMargin))
-      .check(status is 200)
-      .check(
-        jsonPath("$.result").is("success"),
-        jsonPath("$.errors").notExists
-      )
-      .check(
-        jmesPath("meanings[?starts_with(word,'#{filter}')==`true`].id")
-          .ofType[Seq[Any]]
-          .withDefault(Seq.empty)
-          .saveAs("ids"),
-        jmesPath("meanings[?starts_with(word,'#{filter}')==`true`].version")
-          .ofType[Seq[Any]]
-          .withDefault(Seq.empty)
-          .saveAs("versions")
-      )
+  val adminSearch: ChainBuilder =
+    exec(
+      http("Admin search")
+        .post(":8080/api/v1/meaning/search")
+        .asJson
+        .body(StringBody(
+          f"""{
+             |\"requestId\":\"${UUID.randomUUID().toString}\",
+             |\"meaningFilter\":{
+             |  \"approved\":false
+             |}
+             |}""".stripMargin))
+        .check(status is 200)
+        .check(
+          jsonPath("$.result").is("success"),
+          jsonPath("$.errors").notExists
+        )
+        .check(
+          jmesPath("meanings[?starts_with(word,'#{filter}')==`true`].id")
+            .ofType[Seq[Any]]
+            .withDefault(Seq.empty)
+            .saveAs("ids"),
+          jmesPath("meanings[?starts_with(word,'#{filter}')==`true`].version")
+            .ofType[Seq[Any]]
+            .withDefault(Seq.empty)
+            .saveAs("versions")
+        )
+    )
+      .exec { session =>
+        val count = session("ids").as[Seq[Any]].size
+        session.set(
+          "interval",
+          if count < 2 then 0 else (Scenarios.dictionaryAdminInterval.toSeconds - count) / count
+        )
+      }
 
   val adminActions: ChainBuilder =
     asLongAs(session => session("ids").as[Seq[Any]].nonEmpty) {
@@ -120,6 +129,7 @@ object Actions {
           val versions = session("versions").as[Seq[Any]]
           session.setAll(("ids", ids.drop(1)), ("versions", versions.drop(1)))
         }
+        .pause("#{interval}")
     }
 
   private def update(): ChainBuilder =

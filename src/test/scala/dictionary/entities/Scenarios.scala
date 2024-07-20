@@ -8,6 +8,7 @@ import scala.concurrent.duration._
 object Scenarios {
 
   val dictionaryInterval: FiniteDuration = 12.seconds
+  val dictionaryAdminInterval: FiniteDuration = dictionaryInterval * 10
 
   val dictionary: ScenarioBuilder =
     scenario("dictionary")
@@ -29,7 +30,7 @@ object Scenarios {
       .feed(Feeders.filters)
       .exec(Actions.adminLogin)
       .forever(
-        pace(dictionaryInterval * 10)
+        pace(dictionaryAdminInterval)
           .exec(Actions.adminSearch)
           .exec(Actions.adminActions)
           .exec(flushSessionCookies)
