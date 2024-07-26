@@ -6,6 +6,6 @@ import io.gatling.http.protocol.HttpProtocolBuilder
 
 object Protocols {
 
-  val dictionary: HttpProtocolBuilder = http.baseUrl("http://192.168.0.102").shareConnections
+  val dictionary: HttpProtocolBuilder = http.baseUrl("http://192.168.0.101").shareConnections
 
 }

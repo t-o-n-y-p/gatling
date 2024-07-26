@@ -9,11 +9,11 @@ import scala.concurrent.duration.*
 
 class ReliabilitySimulation extends Simulation {
 
-  private val length = 30.minutes
+  private val length = 120.minutes
 
   setUp(
     Scenarios.dictionary.inject(
-      rampUsers(350).during(Scenarios.dictionaryInterval),
+      rampUsers(400).during(Scenarios.dictionaryInterval),
       nothingFor(length)
     ),
     Scenarios.dictionaryAdmins.inject(
